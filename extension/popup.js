@@ -194,4 +194,88 @@ document.getElementById('clear-history').addEventListener('click', () => {
   }
 });
 
+// AI Enhancement Features
+let currentAIResult = '';
+
+function showLoading() {
+  document.getElementById('ai-loading').style.display = 'block';
+  document.getElementById('ai-result').style.display = 'none';
+  document.querySelectorAll('.ai-actions button').forEach(btn => btn.disabled = true);
+}
+
+function hideLoading() {
+  document.getElementById('ai-loading').style.display = 'none';
+  document.querySelectorAll('.ai-actions button').forEach(btn => btn.disabled = false);
+}
+
+function showResult(text) {
+  currentAIResult = text;
+  document.getElementById('ai-output').textContent = text;
+  document.getElementById('ai-result').style.display = 'block';
+  hideLoading();
+}
+
+function showError(message) {
+  hideLoading();
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'error-message';
+  errorDiv.textContent = message;
+  document.getElementById('ai-tab').querySelector('.section').appendChild(errorDiv);
+  setTimeout(() => errorDiv.remove(), 5000);
+}
+
+async function handleAIAction(action) {
+  const input = document.getElementById('ai-input').value.trim();
+
+  if (!input) {
+    showNotification('Please enter a prompt first');
+    return;
+  }
+
+  showLoading();
+
+  try {
+    let result;
+    switch (action) {
+      case 'improve':
+        result = await APIService.improvePrompt(input);
+        break;
+      case 'context':
+        result = await APIService.addContext(input);
+        break;
+      case 'detailed':
+        result = await APIService.makeDetailed(input);
+        break;
+      case 'grammar':
+        result = await APIService.fixGrammar(input);
+        break;
+    }
+
+    showResult(result);
+
+    if (!history.includes(result)) {
+      history.unshift(result);
+      if (history.length > 50) history.pop();
+    }
+    stats.promptCount++;
+    saveData();
+    updateUI();
+  } catch (error) {
+    showError(error.message);
+  }
+}
+
+document.getElementById('improve-btn').addEventListener('click', () => handleAIAction('improve'));
+document.getElementById('add-context-btn').addEventListener('click', () => handleAIAction('context'));
+document.getElementById('make-detailed-btn').addEventListener('click', () => handleAIAction('detailed'));
+document.getElementById('fix-grammar-btn').addEventListener('click', () => handleAIAction('grammar'));
+
+document.getElementById('copy-result').addEventListener('click', () => {
+  copyToClipboard(currentAIResult);
+});
+
+document.getElementById('open-settings').addEventListener('click', () => {
+  chrome.runtime.openOptionsPage();
+});
+
 loadData();

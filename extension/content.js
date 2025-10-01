@@ -20,14 +20,23 @@ function createEnhancerPanel() {
   panel.id = 'prompt-enhancer-panel';
   panel.innerHTML = `
     <div class="enhancer-header">
-      <h3>Prompt Enhancer</h3>
+      <h3>Prompt Enhancer AI</h3>
       <button class="enhancer-close">&times;</button>
     </div>
     <div class="enhancer-content">
       <div class="enhancer-section">
+        <h4>AI Enhancement</h4>
+        <div class="action-buttons">
+          <button data-action="ai-improve">AI Improve</button>
+          <button data-action="ai-context">AI Add Context</button>
+          <button data-action="ai-detailed">AI Make Detailed</button>
+          <button data-action="ai-grammar">Fix Grammar</button>
+        </div>
+      </div>
+      <div class="enhancer-section">
         <h4>Quick Actions</h4>
         <div class="action-buttons">
-          <button data-action="improve">Improve Clarity</button>
+          <button data-action="improve">Add Clarity</button>
           <button data-action="expand">Add Details</button>
           <button data-action="structure">Add Structure</button>
           <button data-action="context">Add Context</button>
@@ -43,6 +52,10 @@ function createEnhancerPanel() {
           <option value="refactor">Refactor Code</option>
           <option value="explain">Explain Code</option>
         </select>
+      </div>
+      <div id="ai-loading-inline" class="ai-loading-inline" style="display: none;">
+        <div class="loading-spinner-small"></div>
+        <span>AI processing...</span>
       </div>
     </div>
   `;
@@ -119,7 +132,11 @@ function showEnhancerPanel(input) {
   enhancerPanel.querySelectorAll('[data-action]').forEach(btn => {
     btn.addEventListener('click', () => {
       const action = btn.dataset.action;
-      enhancePrompt(input, action);
+      if (action.startsWith('ai-')) {
+        enhanceWithAI(input, action);
+      } else {
+        enhancePrompt(input, action);
+      }
     });
   });
 
@@ -173,6 +190,90 @@ function setInputValue(input, value) {
     input.textContent = value;
     input.dispatchEvent(new Event('input', { bubbles: true }));
   }
+}
+
+async function enhanceWithAI(input, action) {
+  const currentText = getInputValue(input);
+
+  if (!currentText.trim()) {
+    showInlineNotification('Please enter some text first');
+    return;
+  }
+
+  const loadingEl = document.getElementById('ai-loading-inline');
+  if (loadingEl) {
+    loadingEl.style.display = 'flex';
+  }
+
+  const buttons = enhancerPanel.querySelectorAll('button[data-action]');
+  buttons.forEach(btn => btn.disabled = true);
+
+  try {
+    const config = await chrome.storage.local.get(['apiKey', 'provider']);
+
+    if (!config.apiKey) {
+      throw new Error('API key not configured. Please set it in extension options.');
+    }
+
+    let instruction;
+    switch (action) {
+      case 'ai-improve':
+        instruction = 'Improve this prompt to be clearer, more specific, and more effective. Return only the improved prompt without any explanations.';
+        break;
+      case 'ai-context':
+        instruction = 'Add helpful context, background information, and structure to this prompt. Return only the enhanced prompt.';
+        break;
+      case 'ai-detailed':
+        instruction = 'Expand this prompt with more details, examples, and specific requirements. Return only the expanded prompt.';
+        break;
+      case 'ai-grammar':
+        instruction = 'Fix any grammar, spelling, or punctuation errors. Return only the corrected prompt.';
+        break;
+    }
+
+    const response = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        {
+          action: 'callLLM',
+          prompt: currentText,
+          instruction,
+          apiKey: config.apiKey,
+          provider: config.provider || 'openai'
+        },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message));
+          } else if (response.success) {
+            resolve(response.result);
+          } else {
+            reject(new Error(response.error));
+          }
+        }
+      );
+    });
+
+    setInputValue(input, response);
+    showInlineNotification('AI enhancement applied!');
+  } catch (error) {
+    showInlineNotification('Error: ' + error.message);
+  } finally {
+    if (loadingEl) {
+      loadingEl.style.display = 'none';
+    }
+    buttons.forEach(btn => btn.disabled = false);
+  }
+}
+
+function showInlineNotification(message) {
+  const notification = document.createElement('div');
+  notification.className = 'enhancer-notification';
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.classList.add('fade-out');
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
 }
 
 function init() {

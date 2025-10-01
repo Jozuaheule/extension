@@ -257,22 +257,110 @@
       letter-spacing: 0.5px;
       opacity: 0.85;
     }
+
+    .ai-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .ai-result {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .ai-output {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .error-message {
+      background: rgba(255, 100, 100, 0.2);
+      border: 1px solid rgba(255, 100, 100, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Prompt Enhancer</h1>
-      <p>Supercharge your prompts</p>
+      <h1>Prompt Enhancer AI</h1>
+      <p>AI-powered prompt enhancement</p>
     </div>
 
     <div class="tabs">
-      <div class="tab active" data-tab="templates">Templates</div>
+      <div class="tab active" data-tab="ai">AI Enhance</div>
+      <div class="tab" data-tab="templates">Templates</div>
       <div class="tab" data-tab="history">History</div>
       <div class="tab" data-tab="custom">Custom</div>
     </div>
 
-    <div id="templates-tab" class="tab-content active">
+    <div id="ai-tab" class="tab-content active">
+      <div class="section">
+        <div class="section-title">AI Prompt Enhancement</div>
+        <div class="input-group">
+          <label>Your Prompt</label>
+          <textarea id="ai-input" placeholder="Enter your prompt here..."></textarea>
+        </div>
+        <div class="ai-actions">
+          <button class="btn btn-primary" id="improve-btn">Improve Prompt</button>
+          <button class="btn btn-secondary" id="add-context-btn">Add Context</button>
+          <button class="btn btn-secondary" id="make-detailed-btn">Make Detailed</button>
+          <button class="btn btn-secondary" id="fix-grammar-btn">Fix Grammar</button>
+        </div>
+        <div id="ai-result" class="ai-result" style="display: none;">
+          <div class="section-title">Enhanced Prompt</div>
+          <div id="ai-output" class="ai-output"></div>
+          <button class="btn btn-primary" id="copy-result">Copy to Clipboard</button>
+        </div>
+        <div id="ai-loading" class="loading" style="display: none;">
+          <div class="loading-spinner"></div>
+          <p>AI is enhancing your prompt...</p>
+        </div>
+      </div>
+      <div class="section">
+        <button class="btn btn-secondary" id="open-settings">Configure API Key</button>
+      </div>
+    </div>
+
+    <div id="templates-tab" class="tab-content">
       <div class="section">
         <div class="section-title">Quick Templates</div>
         <div class="template-list">
@@ -335,6 +423,7 @@
     </div>
   </div>
 
+  <script src="api-service.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
