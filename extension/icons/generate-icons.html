@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Extension Icons</title>
+</head>
+<body>
+  <canvas id="canvas16" width="16" height="16"></canvas>
+  <canvas id="canvas48" width="48" height="48"></canvas>
+  <canvas id="canvas128" width="128" height="128"></canvas>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size / 16;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      const scale = size / 24;
+
+      ctx.beginPath();
+      ctx.moveTo(12 * scale, 4 * scale);
+      ctx.lineTo(4 * scale, 8 * scale);
+      ctx.lineTo(12 * scale, 12 * scale);
+      ctx.lineTo(20 * scale, 8 * scale);
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(4 * scale, 14 * scale);
+      ctx.lineTo(12 * scale, 18 * scale);
+      ctx.lineTo(20 * scale, 14 * scale);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(4 * scale, 11 * scale);
+      ctx.lineTo(12 * scale, 15 * scale);
+      ctx.lineTo(20 * scale, 11 * scale);
+      ctx.stroke();
+    }
+
+    drawIcon(document.getElementById('canvas16'), 16);
+    drawIcon(document.getElementById('canvas48'), 48);
+    drawIcon(document.getElementById('canvas128'), 128);
+
+    console.log('Icons generated! Right-click each canvas and save as PNG:');
+    console.log('- icon16.png (16x16)');
+    console.log('- icon48.png (48x48)');
+    console.log('- icon128.png (128x128)');
+  </script>
+</body>
+</html>

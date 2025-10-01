@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Enhancer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.95;
+    }
+
+    .template-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .template-item {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .template-item:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .template-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .template-desc {
+      font-size: 12px;
+      opacity: 0.85;
+      line-height: 1.4;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      opacity: 0.95;
+    }
+
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .input-group input::placeholder,
+    .input-group textarea::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .input-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: rgba(255, 255, 255, 0.95);
+      color: #667eea;
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-top: 8px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .history-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      word-break: break-word;
+    }
+
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .history-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      opacity: 0.7;
+      font-size: 13px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .tab.active {
+      background: rgba(255, 255, 255, 0.95);
+      color: #667eea;
+    }
+
+    .tab:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Prompt Enhancer</h1>
+      <p>Supercharge your prompts</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="templates">Templates</div>
+      <div class="tab" data-tab="history">History</div>
+      <div class="tab" data-tab="custom">Custom</div>
+    </div>
+
+    <div id="templates-tab" class="tab-content active">
+      <div class="section">
+        <div class="section-title">Quick Templates</div>
+        <div class="template-list">
+          <div class="template-item" data-template="code-review">
+            <div class="template-title">Code Review</div>
+            <div class="template-desc">Request a thorough code review with best practices</div>
+          </div>
+          <div class="template-item" data-template="bug-fix">
+            <div class="template-title">Bug Fix</div>
+            <div class="template-desc">Describe a bug and get debugging assistance</div>
+          </div>
+          <div class="template-item" data-template="feature">
+            <div class="template-title">New Feature</div>
+            <div class="template-desc">Plan and implement a new feature</div>
+          </div>
+          <div class="template-item" data-template="refactor">
+            <div class="template-title">Refactor Code</div>
+            <div class="template-desc">Improve code structure and maintainability</div>
+          </div>
+          <div class="template-item" data-template="explain">
+            <div class="template-title">Explain Code</div>
+            <div class="template-desc">Get detailed explanations of code functionality</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value" id="prompt-count">0</div>
+          <div class="stat-label">Prompts Used</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="saved-count">0</div>
+          <div class="stat-label">Saved</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="history-tab" class="tab-content">
+      <div class="section">
+        <div class="section-title">Recent Prompts</div>
+        <div id="history-list"></div>
+      </div>
+    </div>
+
+    <div id="custom-tab" class="tab-content">
+      <div class="section">
+        <div class="section-title">Create Custom Template</div>
+        <div class="input-group">
+          <label>Template Name</label>
+          <input type="text" id="custom-name" placeholder="e.g., API Documentation">
+        </div>
+        <div class="input-group">
+          <label>Template Content</label>
+          <textarea id="custom-content" placeholder="Enter your prompt template..."></textarea>
+        </div>
+        <button class="btn btn-primary" id="save-template">Save Template</button>
+        <button class="btn btn-secondary" id="clear-history">Clear History</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
